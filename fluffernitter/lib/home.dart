@@ -91,9 +91,16 @@ class _HomeState extends State<Home> {
                                       titleStyle: TextStyle(fontWeight: FontWeight.bold),
                                       useMultithread: true,
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(tLink, style: TextStyle(color: Colors.grey)),
+                                    FractionallySizedBox(
+                                      widthFactor: 1,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          tLink,
+                                          style: TextStyle(color: Colors.grey),
+                                          textAlign: TextAlign.start,
+                                        ),
+                                      ),
                                     )
                                   ],
                                 ),
