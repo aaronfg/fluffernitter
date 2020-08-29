@@ -46,6 +46,9 @@
               <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
               <data
                 android:scheme="https"
+                android:host="twitter.com" />
+              <data
+                android:scheme="https"
                 android:host="*.twitter.com" />
               <data
                 android:scheme="https"
