@@ -69,18 +69,7 @@ class _HomeState extends State<Home> {
                   SizedBox(
                     height: 30,
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 60),
-                  //   child: Text(
-                  //     'Last link',
-                  //     style: TextStyle(fontWeight: FontWeight.bold),
-                  //   ),
-                  // ),
                   if (tLink != 'You haven\'t tapped any Twitter links yet.')
-                    // SimpleUrlPreview(
-                    //   url: tLink,
-                    //   previewHeight: 150,
-                    // ),
                     Container(
                         constraints: BoxConstraints(
                             maxWidth: orientation == Orientation.portrait ? 350 : 400),
@@ -171,7 +160,6 @@ class _HomeState extends State<Home> {
       if (!mounted) return;
       _handleLinkUpdates(uri);
     }, onError: (err) {
-      // Handle exception by warning the user their action did not succeed
       setState(() {
         errMsg = 'Failed to open';
       });
