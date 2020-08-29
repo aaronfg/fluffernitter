@@ -76,6 +76,7 @@ class _HomeState extends State<Home> {
                         child: InkWell(
                           onTap: () => _launchURL(Uri.parse(tLink)),
                           child: Card(
+                              elevation: 5,
                               color: Color.fromRGBO(0, 0, 0, .8),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -85,8 +86,10 @@ class _HomeState extends State<Home> {
                                 child: Column(
                                   children: [
                                     FlutterLinkPreview(
+                                      key: ValueKey("${tLink}211"),
                                       url: tLink,
                                       titleStyle: TextStyle(fontWeight: FontWeight.bold),
+                                      useMultithread: true,
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8.0),
