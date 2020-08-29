@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_link_preview/flutter_link_preview.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
@@ -33,45 +34,81 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    print(tLink.isNotEmpty);
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Text(
-                  'fluffernitter',
-                  style: TextStyle(
-                      color: Color.fromRGBO(255, 108, 96, 1.0),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 50),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 60),
-                  child: Text(
-                    'You have to tap a Twitter.com link for this app to do anything.',
-                    textAlign: TextAlign.center,
+        child: OrientationBuilder(
+          builder: (context, orientation) => Center(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text(
+                    'fluffernitter',
+                    style: TextStyle(
+                        color: Color.fromRGBO(255, 108, 96, 1.0),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 50),
                   ),
-                ),
-                if (loading)
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: CircularProgressIndicator(),
+                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 60),
+                    child: Text(
+                      'You have to tap a Twitter.com link for this app to do anything.',
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                if (errMsg.isNotEmpty)
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Text('Error: $errMsg'),
+                  if (loading)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  if (errMsg.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Text('Error: $errMsg'),
+                    ),
+                  SizedBox(
+                    height: 30,
                   ),
-                SizedBox(
-                  height: 40,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 60),
-                  child: Text('Last link:\n$tLink',
-                      textAlign: TextAlign.center, style: Theme.of(context).textTheme.caption),
-                ),
-              ],
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 60),
+                  //   child: Text(
+                  //     'Last link',
+                  //     style: TextStyle(fontWeight: FontWeight.bold),
+                  //   ),
+                  // ),
+                  if (tLink != 'You haven\'t tapped any Twitter links yet.')
+                    // SimpleUrlPreview(
+                    //   url: tLink,
+                    //   previewHeight: 150,
+                    // ),
+                    Container(
+                        constraints: BoxConstraints(
+                            maxWidth: orientation == Orientation.portrait ? 350 : 400),
+                        child: InkWell(
+                          onTap: () => _launchURL(Uri.parse(tLink)),
+                          child: Card(
+                              color: Color.fromRGBO(0, 0, 0, .8),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18.0,
+                                  vertical: 12.0,
+                                ),
+                                child: Column(
+                                  children: [
+                                    FlutterLinkPreview(
+                                      url: tLink,
+                                      titleStyle: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(tLink, style: TextStyle(color: Colors.grey)),
+                                    )
+                                  ],
+                                ),
+                              )),
+                        )),
+                ],
+              ),
             ),
           ),
         ),

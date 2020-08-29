@@ -32,6 +32,8 @@ dependencies:
   flutter_launcher_icons: ^0.7.5
   http: ^0.12.2
   html: ^0.14.0+3
+  simple_url_preview: ^0.1.11
+  flutter_link_preview: ^1.5.4
 
 dev_dependencies:
   flutter_test:
