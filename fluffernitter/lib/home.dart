@@ -138,7 +138,6 @@ class _HomeState extends State<Home> {
 
   _handleLinkUpdates(Uri uri) async {
     print(_isShortLink(uri));
-    Uri twitterUri;
     if (_isRedirect(uri)) {
       var redirectUrl = _getUriFromRedirect(uri);
       var redUri = Uri.parse(redirectUrl);
@@ -146,20 +145,19 @@ class _HomeState extends State<Home> {
       if (_isTopicsLink(redUri)) {
         _launchURL(_makeNitterUriFromTopicsUri(redUri));
       } else {
-        twitterUri = Uri.parse(redirectUrl);
-        _launchURL(_makeNitterUri(twitterUri));
+        _launchURL(_makeNitterUri(redUri));
       }
     } else if (_isShortLink(uri)) {
       try {
         setState(() {
           loading = true;
         });
-        twitterUri = await _getUriFromShortLinkUri(uri);
+        var twitterUri = await _getUriFromShortLinkUri(uri);
         setState(() {
           loading = false;
         });
         if (twitterUri != null) {
-          _launchURL(_makeNitterUri(uri));
+          _launchURL(_makeNitterUri(twitterUri));
         } else {
           setState(() {
             errMsg = 'Could not get the redirected twitter url from t.co shortlink.';
@@ -175,12 +173,8 @@ class _HomeState extends State<Home> {
       setState(() {
         errMsg = '';
       });
+      _launchURL(_makeNitterUri(uri));
     }
-    // if (twitterUri != null) {
-    //   _launchURL(_makeNitterUri(twitterUri));
-    // } else {
-    //   _launchURL(_makeNitterUri(uri));
-    // }
   }
 
   bool _isRedirect(Uri uri) {
