@@ -1,6 +1,6 @@
 # fluffernitter
 
-A Twitter -> [Nitter.net](https://nitter.net) link redirector written in Flutter
+A Twitter -> [Nitter.net](https://nitter.net) link redirector Android app written in Flutter
 
 ## Description
 
