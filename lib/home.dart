@@ -236,10 +236,12 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void _launchURL(Uri yuri) async {
+  void _launchURL(Uri yuri, {bool updateTLink = true}) async {
     if (await canLaunch(yuri.toString())) {
       setState(() {
-        tLink = yuri.toString();
+        if (updateTLink) {
+          tLink = yuri.toString();
+        }
         errMsg = '';
       });
       await launch(yuri.toString());
@@ -269,6 +271,11 @@ class _HomeState extends State<Home> {
           child: Text(
               'Disclaimer: Nitter.net doesn\'t support every thing Twitter does (Articles and Moments for example).\n\nHowever, if a link doesn\'t work in this app but works in the browser on nitter.net, please let me know.'),
         ),
+        RaisedButton(
+            onPressed: () => _launchURL(
+                Uri.parse('https://github.com/aaronfg/fluffernitter/issues'),
+                updateTLink: false),
+            child: Text('Open issue on Github'))
       ],
     );
   }

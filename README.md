@@ -2,13 +2,13 @@
 
 ![Android homescreen](docs/fluffernitter_logo_header_round_sm.png)
 
-A Twitter -> [Nitter.net](https://nitter.net) link redirector Android app written in Flutter
+A Twitter -> [Nitter.net](https://nitter.net) link redirector app written in Flutter
 
 ![Android homescreen](docs/homescreen_android.png)
 
 ## Description
 
-This Android app registers itself able to handle twitter.com. mobile.twitter.com and t.co links and redirects them to the approproate nitter.net page equivalent. 
+This app registers itself able to handle **twitter.com**. **mobile.twitter.com** and **t.co** links and redirects them to the approproate nitter.net page equivalent. 
 
 ## How To
 
