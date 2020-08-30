@@ -111,6 +111,12 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     ),
+                  Center(
+                    child: IconButton(
+                      icon: Icon(Icons.info_outline),
+                      onPressed: () => _onAboutTapped(),
+                    ),
+                  )
                 ],
               ),
             ),
@@ -132,18 +138,28 @@ class _HomeState extends State<Home> {
 
   _handleLinkUpdates(Uri uri) async {
     print(_isShortLink(uri));
-    if (_isShortLink(uri)) {
+    Uri twitterUri;
+    if (_isRedirect(uri)) {
+      var redirectUrl = _getUriFromRedirect(uri);
+      var redUri = Uri.parse(redirectUrl);
+      // if this is a 'topics' link, just redirect to the tweet
+      if (_isTopicsLink(redUri)) {
+        _launchURL(_makeNitterUriFromTopicsUri(redUri));
+      } else {
+        twitterUri = Uri.parse(redirectUrl);
+        _launchURL(_makeNitterUri(twitterUri));
+      }
+    } else if (_isShortLink(uri)) {
       try {
         setState(() {
           loading = true;
         });
-        var shortLinkResponse = await http.get(uri.toString());
-        var twitterUri = _getUriFromRedirectBody(shortLinkResponse.body);
+        twitterUri = await _getUriFromShortLinkUri(uri);
         setState(() {
           loading = false;
         });
         if (twitterUri != null) {
-          _launchURL(_makeNitterUri(twitterUri));
+          _launchURL(_makeNitterUri(uri));
         } else {
           setState(() {
             errMsg = 'Could not get the redirected twitter url from t.co shortlink.';
@@ -159,8 +175,40 @@ class _HomeState extends State<Home> {
       setState(() {
         errMsg = '';
       });
-      _launchURL(_makeNitterUri(uri));
     }
+    // if (twitterUri != null) {
+    //   _launchURL(_makeNitterUri(twitterUri));
+    // } else {
+    //   _launchURL(_makeNitterUri(uri));
+    // }
+  }
+
+  bool _isRedirect(Uri uri) {
+    return uri.pathSegments.last == 'redirect';
+  }
+
+  String _getUriFromRedirect(Uri redUri) {
+    return redUri.queryParameters['url'];
+  }
+
+  bool _isTopicsLink(Uri uri) {
+    return uri.path.contains('/i/topics/tweet/');
+  }
+
+  Uri _makeNitterUriFromTopicsUri(Uri topicsUri) {
+    var tweetId = topicsUri.pathSegments.last;
+    return Uri(scheme: 'https', host: 'nitter.net', path: 'i/status/$tweetId');
+  }
+
+  Future<Uri> _getUriFromShortLinkUri(Uri shortUri) async {
+    try {
+      var shortLinkResponse = await http.get(shortUri.toString());
+      var twitterUri = _getUriFromRedirectBody(shortLinkResponse.body);
+      return twitterUri;
+    } catch (err) {
+      print(err);
+    }
+    return null;
   }
 
   Uri _getUriFromRedirectBody(String body) {
@@ -220,5 +268,15 @@ class _HomeState extends State<Home> {
         errMsg = 'Could not launch ${yuri.toString()}';
       });
     }
+  }
+
+  _onAboutTapped() {
+    showAboutDialog(
+      context: context,
+      applicationVersion: '1.0.2',
+      applicationIcon: ImageIcon(
+        AssetImage("/assets/fluffernitter_logo_ios.png"),
+      ),
+    );
   }
 }
