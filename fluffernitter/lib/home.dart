@@ -107,7 +107,6 @@ class _HomeState extends State<Home> {
   }
 
   void _handleLinkUpdates(Uri uri) async {
-    print(_isShortLink(uri));
     if (_isRedirect(uri)) {
       var redirectUrl = _getUriFromRedirect(uri);
       var redUri = Uri.parse(redirectUrl);
@@ -140,7 +139,6 @@ class _HomeState extends State<Home> {
           loading = false;
           errMsg = err.toString();
         });
-        print(err);
       }
     } else if (_isMediaGridLink(uri)) {
       _launchURL(_makeNitterUriFromMediaGridUri(uri));
@@ -191,7 +189,6 @@ class _HomeState extends State<Home> {
       var twitterUri = _getUriFromRedirectBody(shortLinkResponse.body);
       return twitterUri;
     } catch (err) {
-      print(err);
       setState(() {
         errMsg = err.toString();
       });
