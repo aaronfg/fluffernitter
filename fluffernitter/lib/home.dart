@@ -114,6 +114,8 @@ class _HomeState extends State<Home> {
       // if this is a 'topics' link, just redirect to the tweet
       if (_isTopicsLink(redUri)) {
         _launchURL(_makeNitterUriFromTopicsUri(redUri));
+      } else if (_isMediaGridLink(redUri)) {
+        _launchURL(_makeNitterUriFromMediaGridUri(redUri));
       } else {
         _launchURL(_makeNitterUri(redUri));
       }
@@ -140,6 +142,8 @@ class _HomeState extends State<Home> {
         });
         print(err);
       }
+    } else if (_isMediaGridLink(uri)) {
+      _launchURL(_makeNitterUriFromMediaGridUri(uri));
     } else {
       setState(() {
         errMsg = '';
@@ -158,6 +162,10 @@ class _HomeState extends State<Home> {
 
   bool _isTopicsLink(Uri uri) {
     return uri.path.contains('/i/topics/tweet/');
+  }
+
+  bool _isMediaGridLink(Uri uri) {
+    return uri.path.endsWith('media/grid');
   }
 
   String _getUriFromRedirect(Uri redUri) {
@@ -203,6 +211,11 @@ class _HomeState extends State<Home> {
   Uri _makeNitterUriFromTopicsUri(Uri topicsUri) {
     var tweetId = topicsUri.pathSegments.last;
     return Uri(scheme: 'https', host: 'nitter.net', path: 'i/status/$tweetId');
+  }
+
+  Uri _makeNitterUriFromMediaGridUri(Uri mgUri) {
+    var segs = mgUri.pathSegments.sublist(0, mgUri.pathSegments.length - 1);
+    return Uri(scheme: 'https', host: 'nitter.net', pathSegments: segs);
   }
 
   Future<Null> _initUniLinks() async {
