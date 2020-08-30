@@ -59,18 +59,32 @@ class _HomeState extends State<Home> {
                   ),
                   if (loading)
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.only(top: 8.0, bottom: 16),
                       child: CircularProgressIndicator(
                         backgroundColor: Colors.black.withOpacity(.4),
                       ),
                     ),
                   if (errMsg.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Text('Error: $errMsg'),
+                    Container(
+                      color: Colors.red,
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 60),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Error:', style: linkTitle),
+                            Text(
+                              errMsg,
+                              style: TextStyle(color: Colors.white),
+                              textAlign: TextAlign.left,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   SizedBox(
-                    height: 30,
+                    height: 10,
                   ),
                   if (tLink.isNotEmpty)
                     Container(
@@ -166,6 +180,7 @@ class _HomeState extends State<Home> {
       } catch (err) {
         setState(() {
           loading = false;
+          errMsg = err.toString();
         });
         print(err);
       }
@@ -201,6 +216,9 @@ class _HomeState extends State<Home> {
       return twitterUri;
     } catch (err) {
       print(err);
+      setState(() {
+        errMsg = err.toString();
+      });
     }
     return null;
   }
