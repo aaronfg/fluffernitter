@@ -1,8 +1,10 @@
 # fluffernitter
 
-![Android homescreen](docs/homescreen_android.png)
+![Android homescreen](docs/fluffernitter_logo_header_round_sm.png)
 
 A Twitter -> [Nitter.net](https://nitter.net) link redirector Android app written in Flutter
+
+![Android homescreen](docs/homescreen_android.png)
 
 ## Description
 
