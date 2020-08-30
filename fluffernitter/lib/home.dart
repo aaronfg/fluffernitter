@@ -266,15 +266,24 @@ class _HomeState extends State<Home> {
 
   _onAboutTapped() {
     showAboutDialog(
-        context: context,
-        applicationVersion: '1.0.2',
-        applicationIcon: Container(
-          decoration: BoxDecoration(shape: BoxShape.circle),
-          child: CircleAvatar(
-            backgroundImage: AssetImage("assets/fluffernitter_logo_icon_alpha.png"),
-            backgroundColor: Colors.transparent,
-          ),
+      context: context,
+      applicationName: 'fluffernitter',
+      applicationVersion: '1.0.3',
+      applicationIcon: Container(
+        decoration: BoxDecoration(shape: BoxShape.circle),
+        child: CircleAvatar(
+          backgroundImage: AssetImage("assets/fluffernitter_logo_icon_alpha.png"),
+          backgroundColor: Colors.transparent,
         ),
-        children: [Text('\u00a9 ${DateTime.now().year.toString()} Aaron F. Gonzalez')]);
+      ),
+      children: [
+        Text('\u00a9 ${DateTime.now().year.toString()} Aaron F. Gonzalez'),
+        Padding(
+          padding: const EdgeInsets.only(top: 12.0),
+          child: Text(
+              'Disclaimer: Nitter.net doesn\'t support every thing Twitter does (Articles and Moments for example).\n\nHowever, if a link doesn\'t work in this app but works in the browser on nitter.net, please let me know.'),
+        ),
+      ],
+    );
   }
 }
