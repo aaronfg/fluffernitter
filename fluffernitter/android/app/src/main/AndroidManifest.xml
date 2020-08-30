@@ -43,13 +43,13 @@
               <action android:name="android.intent.action.VIEW" />
               <category android:name="android.intent.category.DEFAULT" />
               <category android:name="android.intent.category.BROWSABLE" />
-              <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
+              <!-- Accepts Twitter Uris -->
               <data
                 android:scheme="https"
                 android:host="twitter.com" />
               <data
                 android:scheme="https"
-                android:host="*.twitter.com" />
+                android:host="mobile.twitter.com" />
               <data
                 android:scheme="https"
                 android:host="t.co" />

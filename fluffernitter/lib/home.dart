@@ -37,7 +37,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    print(tLink.isNotEmpty);
     return Scaffold(
       body: SafeArea(
         child: OrientationBuilder(
@@ -107,11 +106,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  bool _isShortLink(Uri uri) {
-    return uri.host == 't.co';
-  }
-
-  _handleLinkUpdates(Uri uri) async {
+  void _handleLinkUpdates(Uri uri) async {
     print(_isShortLink(uri));
     if (_isRedirect(uri)) {
       var redirectUrl = _getUriFromRedirect(uri);
@@ -153,21 +148,33 @@ class _HomeState extends State<Home> {
     }
   }
 
-  bool _isRedirect(Uri uri) {
-    return uri.pathSegments.last == 'redirect';
+  bool _isShortLink(Uri uri) {
+    return uri.host == 't.co';
   }
 
-  String _getUriFromRedirect(Uri redUri) {
-    return redUri.queryParameters['url'];
+  bool _isRedirect(Uri uri) {
+    return uri.pathSegments.last == 'redirect';
   }
 
   bool _isTopicsLink(Uri uri) {
     return uri.path.contains('/i/topics/tweet/');
   }
 
-  Uri _makeNitterUriFromTopicsUri(Uri topicsUri) {
-    var tweetId = topicsUri.pathSegments.last;
-    return Uri(scheme: 'https', host: 'nitter.net', path: 'i/status/$tweetId');
+  String _getUriFromRedirect(Uri redUri) {
+    return redUri.queryParameters['url'];
+  }
+
+  Uri _getUriFromRedirectBody(String body) {
+    var doc = parse(body);
+    var linkEl = doc.getElementsByTagName('link');
+    for (var link in linkEl) {
+      if (link.attributes['rel'] == 'canonical') {
+        print('final twitter url:');
+        print(link.attributes['href']);
+        return Uri.parse(link.attributes['href']);
+      }
+    }
+    return null;
   }
 
   Future<Uri> _getUriFromShortLinkUri(Uri shortUri) async {
@@ -184,17 +191,18 @@ class _HomeState extends State<Home> {
     return null;
   }
 
-  Uri _getUriFromRedirectBody(String body) {
-    var doc = parse(body);
-    var linkEl = doc.getElementsByTagName('link');
-    for (var link in linkEl) {
-      if (link.attributes['rel'] == 'canonical') {
-        print('final twitter url:');
-        print(link.attributes['href']);
-        return Uri.parse(link.attributes['href']);
-      }
-    }
-    return null;
+  Uri _makeNitterUri(Uri tUri) {
+    final Uri nUri = Uri(
+      scheme: 'https',
+      host: 'nitter.net',
+      path: tUri.path,
+    );
+    return nUri;
+  }
+
+  Uri _makeNitterUriFromTopicsUri(Uri topicsUri) {
+    var tweetId = topicsUri.pathSegments.last;
+    return Uri(scheme: 'https', host: 'nitter.net', path: 'i/status/$tweetId');
   }
 
   Future<Null> _initUniLinks() async {
@@ -210,8 +218,6 @@ class _HomeState extends State<Home> {
       Uri initialUri = await getInitialUri();
       if (initialUri != null) {
         _handleLinkUpdates(initialUri);
-      } else {
-        print('null!!!!!');
       }
     } on PlatformException {
       setState(() {
@@ -220,16 +226,7 @@ class _HomeState extends State<Home> {
     }
   }
 
-  _makeNitterUri(Uri tUri) {
-    final Uri nUri = Uri(
-      scheme: 'https',
-      host: 'nitter.net',
-      path: tUri.path,
-    );
-    return nUri;
-  }
-
-  _launchURL(Uri yuri) async {
+  void _launchURL(Uri yuri) async {
     if (await canLaunch(yuri.toString())) {
       setState(() {
         tLink = yuri.toString();
@@ -243,7 +240,7 @@ class _HomeState extends State<Home> {
     }
   }
 
-  _onAboutTapped() {
+  void _onAboutTapped() {
     showAboutDialog(
       context: context,
       applicationName: 'fluffernitter',
