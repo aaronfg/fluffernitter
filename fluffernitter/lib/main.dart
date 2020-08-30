@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
       title: 'Fluffernitter',
       theme: ThemeData(
         primarySwatch: Colors.red,
+        accentColor: Color.fromRGBO(255, 108, 96, 1.0),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         brightness: Brightness.dark,
       ),

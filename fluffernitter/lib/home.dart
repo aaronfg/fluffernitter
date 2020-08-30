@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_link_preview/flutter_link_preview.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
@@ -15,13 +16,18 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   StreamSubscription _sub;
-
-  String tLink = 'You haven\'t tapped any Twitter links yet.';
+  TextStyle linkTitle;
+  TextStyle linkUrl;
+  TextStyle appTitle;
+  String tLink = '';
   String errMsg = '';
+  String duh = 'You have to tap a Twitter.com link for this app to do anything.';
   bool loading = false;
 
   @override
   void initState() {
+    FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
+    _setupStyles();
     _initUniLinks();
     super.initState();
   }
@@ -42,24 +48,21 @@ class _HomeState extends State<Home> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Text(
-                    'fluffernitter',
-                    style: TextStyle(
-                        color: Color.fromRGBO(255, 108, 96, 1.0),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 50),
-                  ),
+                  Text('fluffernitter',
+                      style: appTitle.copyWith(color: Theme.of(context).accentColor)),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 60),
                     child: Text(
-                      'You have to tap a Twitter.com link for this app to do anything.',
+                      duh,
                       textAlign: TextAlign.center,
                     ),
                   ),
                   if (loading)
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.black.withOpacity(.4),
+                      ),
                     ),
                   if (errMsg.isNotEmpty)
                     Padding(
@@ -69,7 +72,7 @@ class _HomeState extends State<Home> {
                   SizedBox(
                     height: 30,
                   ),
-                  if (tLink != 'You haven\'t tapped any Twitter links yet.')
+                  if (tLink.isNotEmpty)
                     Container(
                         constraints: BoxConstraints(
                             maxWidth: orientation == Orientation.portrait ? 350 : 400),
@@ -88,7 +91,7 @@ class _HomeState extends State<Home> {
                                     FlutterLinkPreview(
                                       key: ValueKey("${tLink}211"),
                                       url: tLink,
-                                      titleStyle: TextStyle(fontWeight: FontWeight.bold),
+                                      titleStyle: linkTitle,
                                       useMultithread: true,
                                     ),
                                     FractionallySizedBox(
@@ -97,7 +100,7 @@ class _HomeState extends State<Home> {
                                         padding: const EdgeInsets.only(top: 8.0),
                                         child: Text(
                                           tLink,
-                                          style: TextStyle(color: Colors.grey),
+                                          style: linkUrl,
                                           textAlign: TextAlign.start,
                                         ),
                                       ),
@@ -113,6 +116,12 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
+  }
+
+  _setupStyles() {
+    linkTitle = TextStyle(fontWeight: FontWeight.bold);
+    linkUrl = TextStyle(color: Colors.grey);
+    appTitle = TextStyle(fontWeight: FontWeight.bold, fontSize: 50);
   }
 
   bool isShortLink(Uri uri) {
