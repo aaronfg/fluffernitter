@@ -272,11 +272,15 @@ class _HomeState extends State<Home> {
 
   _onAboutTapped() {
     showAboutDialog(
-      context: context,
-      applicationVersion: '1.0.2',
-      applicationIcon: ImageIcon(
-        AssetImage("/assets/fluffernitter_logo_ios.png"),
-      ),
-    );
+        context: context,
+        applicationVersion: '1.0.2',
+        applicationIcon: Container(
+          decoration: BoxDecoration(shape: BoxShape.circle),
+          child: CircleAvatar(
+            backgroundImage: AssetImage("assets/fluffernitter_logo_icon_alpha.png"),
+            backgroundColor: Colors.transparent,
+          ),
+        ),
+        children: [Text('\u00a9 ${DateTime.now().year.toString()} Aaron F. Gonzalez')]);
   }
 }
