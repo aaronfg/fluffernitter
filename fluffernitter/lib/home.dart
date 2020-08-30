@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:fluffernitter/styles.dart';
+import 'package:fluffernitter/widgets/last_link_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_link_preview/flutter_link_preview.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -87,39 +87,9 @@ class _HomeState extends State<Home> {
                     Container(
                       constraints:
                           BoxConstraints(maxWidth: orientation == Orientation.portrait ? 350 : 400),
-                      child: InkWell(
+                      child: LastLinkPreview(
+                        linkUrl: tLink,
                         onTap: () => _launchURL(Uri.parse(tLink)),
-                        child: Card(
-                          elevation: 5,
-                          color: Color.fromRGBO(0, 0, 0, .8),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18.0,
-                              vertical: 12.0,
-                            ),
-                            child: Column(
-                              children: [
-                                FlutterLinkPreview(
-                                  key: ValueKey("${tLink}211"),
-                                  url: tLink,
-                                  titleStyle: Stylez.bold,
-                                  useMultithread: true,
-                                ),
-                                FractionallySizedBox(
-                                  widthFactor: 1,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Text(
-                                      tLink,
-                                      style: Stylez.linkUrl,
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
                       ),
                     ),
                   Center(
