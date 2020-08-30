@@ -74,41 +74,43 @@ class _HomeState extends State<Home> {
                   ),
                   if (tLink.isNotEmpty)
                     Container(
-                        constraints: BoxConstraints(
-                            maxWidth: orientation == Orientation.portrait ? 350 : 400),
-                        child: InkWell(
-                          onTap: () => _launchURL(Uri.parse(tLink)),
-                          child: Card(
-                              elevation: 5,
-                              color: Color.fromRGBO(0, 0, 0, .8),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 18.0,
-                                  vertical: 12.0,
+                      constraints:
+                          BoxConstraints(maxWidth: orientation == Orientation.portrait ? 350 : 400),
+                      child: InkWell(
+                        onTap: () => _launchURL(Uri.parse(tLink)),
+                        child: Card(
+                          elevation: 5,
+                          color: Color.fromRGBO(0, 0, 0, .8),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18.0,
+                              vertical: 12.0,
+                            ),
+                            child: Column(
+                              children: [
+                                FlutterLinkPreview(
+                                  key: ValueKey("${tLink}211"),
+                                  url: tLink,
+                                  titleStyle: linkTitle,
+                                  useMultithread: true,
                                 ),
-                                child: Column(
-                                  children: [
-                                    FlutterLinkPreview(
-                                      key: ValueKey("${tLink}211"),
-                                      url: tLink,
-                                      titleStyle: linkTitle,
-                                      useMultithread: true,
+                                FractionallySizedBox(
+                                  widthFactor: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      tLink,
+                                      style: linkUrl,
+                                      textAlign: TextAlign.start,
                                     ),
-                                    FractionallySizedBox(
-                                      widthFactor: 1,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 8.0),
-                                        child: Text(
-                                          tLink,
-                                          style: linkUrl,
-                                          textAlign: TextAlign.start,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              )),
-                        )),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -124,13 +126,13 @@ class _HomeState extends State<Home> {
     appTitle = TextStyle(fontWeight: FontWeight.bold, fontSize: 50);
   }
 
-  bool isShortLink(Uri uri) {
+  bool _isShortLink(Uri uri) {
     return uri.host == 't.co';
   }
 
   _handleLinkUpdates(Uri uri) async {
-    print(isShortLink(uri));
-    if (isShortLink(uri)) {
+    print(_isShortLink(uri));
+    if (_isShortLink(uri)) {
       try {
         setState(() {
           loading = true;
