@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fluffernitter/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_link_preview/flutter_link_preview.dart';
@@ -16,9 +17,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   StreamSubscription _sub;
-  TextStyle linkTitle;
-  TextStyle linkUrl;
-  TextStyle appTitle;
   String tLink = '';
   String errMsg = '';
   String duh = 'You have to tap a Twitter.com link for this app to do anything.';
@@ -27,7 +25,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
-    _setupStyles();
     _initUniLinks();
     super.initState();
   }
@@ -49,7 +46,7 @@ class _HomeState extends State<Home> {
               child: Column(
                 children: [
                   Text('fluffernitter',
-                      style: appTitle.copyWith(color: Theme.of(context).accentColor)),
+                      style: Stylez.appTitle.copyWith(color: Theme.of(context).accentColor)),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 60),
                     child: Text(
@@ -73,10 +70,10 @@ class _HomeState extends State<Home> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('Error:', style: linkTitle),
+                            Text('Error:', style: Stylez.bold),
                             Text(
                               errMsg,
-                              style: TextStyle(color: Colors.white),
+                              style: Stylez.errorMsg,
                               textAlign: TextAlign.left,
                             ),
                           ],
@@ -105,7 +102,7 @@ class _HomeState extends State<Home> {
                                 FlutterLinkPreview(
                                   key: ValueKey("${tLink}211"),
                                   url: tLink,
-                                  titleStyle: linkTitle,
+                                  titleStyle: Stylez.bold,
                                   useMultithread: true,
                                 ),
                                 FractionallySizedBox(
@@ -114,7 +111,7 @@ class _HomeState extends State<Home> {
                                     padding: const EdgeInsets.only(top: 8.0),
                                     child: Text(
                                       tLink,
-                                      style: linkUrl,
+                                      style: Stylez.linkUrl,
                                       textAlign: TextAlign.start,
                                     ),
                                   ),
@@ -138,12 +135,6 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
-  }
-
-  _setupStyles() {
-    linkTitle = TextStyle(fontWeight: FontWeight.bold);
-    linkUrl = TextStyle(color: Colors.grey);
-    appTitle = TextStyle(fontWeight: FontWeight.bold, fontSize: 50);
   }
 
   bool _isShortLink(Uri uri) {
@@ -286,7 +277,7 @@ class _HomeState extends State<Home> {
     showAboutDialog(
       context: context,
       applicationName: 'fluffernitter',
-      applicationVersion: '1.0.3',
+      applicationVersion: '1.0.4',
       applicationIcon: Container(
         decoration: BoxDecoration(shape: BoxShape.circle),
         child: CircleAvatar(
