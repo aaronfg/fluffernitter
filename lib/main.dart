@@ -1,7 +1,9 @@
 import 'package:fluffernitter/home.dart';
+import 'package:fluffernitter/service_locator.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  setup();
   runApp(MyApp());
 }
 

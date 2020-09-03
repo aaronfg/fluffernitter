@@ -22,7 +22,6 @@ class _HomeState extends State<Home> {
   StreamSubscription _sub;
   StreamSubscription _intentDataStreamSubscription;
   List<String> _whitelistHosts = ['twitter.com', 'mobile.twitter.com', 't.co'];
-  String _sharedText = '';
   String tLink = '';
   String errMsg = '';
   String duh = 'You have to tap a Twitter.com link for this app to do anything.';
@@ -100,7 +99,6 @@ class _HomeState extends State<Home> {
                         onTap: () => _launchURL(Uri.parse(tLink)),
                       ),
                     ),
-                  Text('Shared Text: $_sharedText'),
                   Center(
                     child: IconButton(
                       icon: Icon(Icons.info_outline),
@@ -251,7 +249,6 @@ class _HomeState extends State<Home> {
     _intentDataStreamSubscription = ReceiveSharingIntent.getTextStream().listen((String value) {
       print('app already open, received text: $value');
       setState(() {
-        _sharedText = value;
         _parseSharedText(value);
       });
     }, onError: (err) {
@@ -262,7 +259,6 @@ class _HomeState extends State<Home> {
     ReceiveSharingIntent.getInitialText().then((String value) {
       print('app closed, received text: $value');
       setState(() {
-        _sharedText = value;
         _parseSharedText(value);
       });
     });
@@ -319,9 +315,6 @@ class _HomeState extends State<Home> {
           ),
         );
       }
-      setState(() {
-        _sharedText = '';
-      });
     } catch (err) {
       if (err is FormatException) {
         print('EXCEPTION!!');
