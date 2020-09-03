@@ -10,6 +10,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
 
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -21,17 +23,37 @@ class _HomeState extends State<Home> {
   String errMsg = '';
   String duh = 'You have to tap a Twitter.com link for this app to do anything.';
   bool loading = false;
+  StreamSubscription _intentDataStreamSubscription;
+  String _sharedText;
 
   @override
   void initState() {
     FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
     _initUniLinks();
+
+    // For sharing or opening urls/text coming from outside the app while the app is in the memory
+    _intentDataStreamSubscription = ReceiveSharingIntent.getTextStream().listen((String value) {
+      setState(() {
+        _sharedText = value;
+      });
+    }, onError: (err) {
+      print("getLinkStream error: $err");
+    });
+
+    // For sharing or opening urls/text coming from outside the app while the app is closed
+    ReceiveSharingIntent.getInitialText().then((String value) {
+      setState(() {
+        _sharedText = value;
+      });
+    });
+
     super.initState();
   }
 
   @override
   void dispose() {
     _sub.cancel();
+    _intentDataStreamSubscription.cancel();
     super.dispose();
   }
 
@@ -96,7 +118,9 @@ class _HomeState extends State<Home> {
                       icon: Icon(Icons.info_outline),
                       onPressed: () => _onAboutTapped(),
                     ),
-                  )
+                  ),
+                  Text('Shared Urls'),
+                  Text(_sharedText ?? "none yet"),
                 ],
               ),
             ),
