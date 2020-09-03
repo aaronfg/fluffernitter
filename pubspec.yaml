@@ -35,6 +35,7 @@ dependencies:
   simple_url_preview: ^0.1.11
   flutter_link_preview: ^1.5.4
   flutter_statusbarcolor: ^0.2.3
+  receive_sharing_intent: ^1.4.1
 
 dev_dependencies:
   flutter_test:

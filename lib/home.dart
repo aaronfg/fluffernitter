@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:fluffernitter/styles.dart';
 import 'package:fluffernitter/widgets/last_link_preview.dart';
+import 'package:fluffernitter/widgets/unsupported_url_content.dart';
+import 'package:fluffernitter/widgets/unuspported_text_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
@@ -17,21 +20,27 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   StreamSubscription _sub;
+  StreamSubscription _intentDataStreamSubscription;
+  List<String> _whitelistHosts = ['twitter.com', 'mobile.twitter.com', 't.co'];
+  String _sharedText = '';
   String tLink = '';
   String errMsg = '';
   String duh = 'You have to tap a Twitter.com link for this app to do anything.';
   bool loading = false;
+  bool _alwaysRedirectOtherUrls = false;
 
   @override
   void initState() {
     FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
     _initUniLinks();
+    _initShareIntentHandling();
     super.initState();
   }
 
   @override
   void dispose() {
     _sub.cancel();
+    _intentDataStreamSubscription.cancel();
     super.dispose();
   }
 
@@ -91,6 +100,7 @@ class _HomeState extends State<Home> {
                         onTap: () => _launchURL(Uri.parse(tLink)),
                       ),
                     ),
+                  Text('Shared Text: $_sharedText'),
                   Center(
                     child: IconButton(
                       icon: Icon(Icons.info_outline),
@@ -236,6 +246,89 @@ class _HomeState extends State<Home> {
     }
   }
 
+  _initShareIntentHandling() {
+    // For sharing or opening urls/text coming from outside the app while the app is in the memory
+    _intentDataStreamSubscription = ReceiveSharingIntent.getTextStream().listen((String value) {
+      print('app already open, received text: $value');
+      setState(() {
+        _sharedText = value;
+        _parseSharedText(value);
+      });
+    }, onError: (err) {
+      print("getLinkStream error: $err");
+    });
+
+    // For sharing or opening urls/text coming from outside the app while the app is closed
+    ReceiveSharingIntent.getInitialText().then((String value) {
+      print('app closed, received text: $value');
+      setState(() {
+        _sharedText = value;
+        _parseSharedText(value);
+      });
+    });
+  }
+
+  bool _isValidUri(Uri uri) {
+    return uri.hasScheme && _whitelistHosts.contains(uri.host);
+  }
+
+  bool _isUrl(Uri uri) {
+    return uri.hasScheme && (uri.host != null && uri.host.isNotEmpty);
+  }
+
+  void _parseSharedText(String txt) {
+    try {
+      Uri uri = Uri.parse(txt);
+      // all good
+      if (_isValidUri(uri)) {
+        _handleLinkUpdates(uri);
+      } else if (_isUrl(uri)) {
+        // are we at least a url?
+        print('-----> Not a twitter link! redirect to browser');
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Oops'),
+            content: SingleChildScrollView(
+              child: UnsupportedUrlContent(
+                badUrl: txt,
+                alwaysRedirectOtherUrls: _alwaysRedirectOtherUrls,
+                onAlwaysRedirectPrefChange: _onAlwaysRedirectPrefChange,
+              ),
+            ),
+            actions: [
+              FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Close')),
+              FlatButton(
+                  onPressed: () => _launchURL(uri, updateTLink: false),
+                  child: Text('Open in browser'))
+            ],
+          ),
+        );
+      } else {
+        // this has to just be text. no bueno.
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Oops'),
+            content: SingleChildScrollView(
+              child: UnsupportedTextContent(
+                text: txt,
+              ),
+            ),
+            actions: [FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Ok'))],
+          ),
+        );
+      }
+      setState(() {
+        _sharedText = '';
+      });
+    } catch (err) {
+      if (err is FormatException) {
+        print('EXCEPTION!!');
+      }
+    }
+  }
+
   void _launchURL(Uri yuri, {bool updateTLink = true}) async {
     if (await canLaunch(yuri.toString())) {
       setState(() {
@@ -250,6 +343,12 @@ class _HomeState extends State<Home> {
         errMsg = 'Could not launch ${yuri.toString()}';
       });
     }
+  }
+
+  void _onAlwaysRedirectPrefChange(bool value) {
+    setState(() {
+      _alwaysRedirectOtherUrls = value;
+    });
   }
 
   void _onAboutTapped() {
