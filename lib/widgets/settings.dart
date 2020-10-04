@@ -69,31 +69,29 @@ class _SettingsState extends State<Settings> {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Flexible(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _instanceController,
-                onChanged: _onInstanceChanged,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _instanceController,
+              onChanged: _onInstanceChanged,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 12),
+              child: Row(
+                children: [
+                  Text(
+                    'Please use a fully qualified url. ie:  ',
+                    style: Stylez.linkUrl,
+                  ),
+                  Text(
+                    'http://nitter.net',
+                    style: Stylez.instanceHint,
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 12),
-                child: Row(
-                  children: [
-                    Text(
-                      'Please use a fully qualified url. ie:  ',
-                      style: Stylez.linkUrl,
-                    ),
-                    Text(
-                      'http://nitter.net',
-                      style: Stylez.instanceHint,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
