@@ -415,7 +415,12 @@ class _HomeState extends State<Home> {
   void _onSettingsPressed() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Settings(),
+      isScrollControlled: true,
+      builder: (context) => Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Settings()),
     );
   }
 }

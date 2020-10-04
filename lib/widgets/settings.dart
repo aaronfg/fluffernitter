@@ -1,3 +1,5 @@
+import 'package:fluffernitter/service_locator.dart';
+import 'package:fluffernitter/services/user_prefs_service.dart';
 import 'package:fluffernitter/styles.dart';
 import 'package:flutter/material.dart';
 
@@ -10,14 +12,23 @@ class _SettingsState extends State<Settings> {
   TextEditingController _instanceController;
   @override
   void initState() {
-    _instanceController = TextEditingController(text: 'nitter.net');
+    _instanceController = TextEditingController(
+        text: locator
+            .get<UserPrefsService>()
+            .userPrefs
+            .nitterInstance
+            .toString());
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: CustomScrollView(slivers: _buildSlivers(), shrinkWrap: true,),
+      child: CustomScrollView(
+        slivers: _buildSlivers(),
+        shrinkWrap: true,
+      ),
     );
     // return Text('asdas');
   }
@@ -33,9 +44,12 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget _buildTitle() {
-    return SliverToBoxAdapter(child: Padding(
+    return SliverToBoxAdapter(
+        child: Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Center(child: Text('Settings', style: Stylez.forContext(context, Stylez.screenTitle))),
+      child: Center(
+          child: Text('Settings',
+              style: Stylez.forContext(context, Stylez.screenTitle))),
     ));
   }
 
@@ -43,8 +57,9 @@ class _SettingsState extends State<Settings> {
     return SliverToBoxAdapter(
       child: Padding(
         padding: EdgeInsets.fromLTRB(8, 8, 8, 0),
-        child: Text(title,
-            style: Stylez.forContext(context, Stylez.bold),
+        child: Text(
+          title,
+          style: Stylez.forContext(context, Stylez.bold),
         ),
       ),
     );
@@ -54,8 +69,31 @@ class _SettingsState extends State<Settings> {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: TextField(
-          controller: _instanceController,
+        child: Flexible(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _instanceController,
+                onChanged: _onInstanceChanged,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 12),
+                child: Row(
+                  children: [
+                    Text(
+                      'Please use a fully qualified url. ie:  ',
+                      style: Stylez.linkUrl,
+                    ),
+                    Text(
+                      'http://nitter.net',
+                      style: Stylez.instanceHint,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -65,7 +103,7 @@ class _SettingsState extends State<Settings> {
     return SliverToBoxAdapter(
       child: ListTile(
         title: Text('About'),
-        onTap: ()=>{},
+        onTap: () => {},
         contentPadding: EdgeInsets.symmetric(horizontal: 8),
       ),
     );
@@ -76,14 +114,31 @@ class _SettingsState extends State<Settings> {
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 8.0),
         child: FractionallySizedBox(
-            widthFactor: .5,
-            child: RaisedButton(onPressed: _onOkTap, child: Text('OK'),),
+          widthFactor: .5,
+          child: RaisedButton(
+            onPressed: _instanceController.text.isEmpty ? null : _onSaveTap,
+            child: Text('Save'),
+          ),
         ),
       ),
     );
   }
 
-  void _onOkTap() {
+  void _onSaveTap() {
+    UserPrefsService prefsSrv = locator.get<UserPrefsService>();
+    // if they updated the instance, save it
+    if (_instanceController.text !=
+        prefsSrv.userPrefs.nitterInstance.toString()) {
+      try {
+        prefsSrv.updateNitterInstance(_instanceController.text);
+      } catch (er) {
+        print('uh oh');
+      }
+    }
     Navigator.pop(context);
+  }
+
+  void _onInstanceChanged(String value) {
+    setState(() {});
   }
 }
