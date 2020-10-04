@@ -10,15 +10,20 @@ class UserPrefs {
   /// url is shared with the app.
   bool alwaysRedirectUnsupportedLinks;
 
-  UserPrefs(this.alwaysRedirectUnsupportedLinks);
+  /// The Nitter instance to redirect Twitter links to.
+  Uri nitterInstance;
+
+  UserPrefs(this.alwaysRedirectUnsupportedLinks, this.nitterInstance);
 
   /// Creates a new empty UserPrefs instance
   UserPrefs.empty() {
     alwaysRedirectUnsupportedLinks = false;
+    nitterInstance = Uri.parse('https://nitter.net');
   }
 
   /// Generate a new UserPrefs instance from Json
-  factory UserPrefs.fromJson(Map<String, dynamic> json) => _$UserPrefsFromJson(json);
+  factory UserPrefs.fromJson(Map<String, dynamic> json) =>
+      _$UserPrefsFromJson(json);
 
   /// Serializes this class instance to Json
   Map<String, dynamic> toJson() => _$UserPrefsToJson(this);
