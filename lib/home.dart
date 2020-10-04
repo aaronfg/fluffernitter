@@ -40,66 +40,79 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: SafeArea(
         child: OrientationBuilder(
-          builder: (context, orientation) => Center(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Text('fluffernitter',
-                      style: Stylez.appTitle.copyWith(color: Theme.of(context).accentColor)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 60),
-                    child: Text(
-                      duh,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  if (loading)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0, bottom: 16),
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.black.withOpacity(.4),
-                      ),
-                    ),
-                  if (errMsg.isNotEmpty)
-                    Container(
-                      color: Colors.red,
-                      width: MediaQuery.of(context).size.width,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 60),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Error:', style: Stylez.bold),
-                            Text(
-                              errMsg,
-                              style: Stylez.errorMsg,
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
+          builder: (context, orientation) => Stack(
+            children: [
+              Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Text('fluffernitter',
+                          style: Stylez.appTitle.copyWith(color: Theme.of(context).accentColor)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 60),
+                        child: Text(
+                          duh,
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                    ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  if (tLink.isNotEmpty)
-                    Container(
-                      constraints:
-                          BoxConstraints(maxWidth: orientation == Orientation.portrait ? 350 : 400),
-                      child: LastLinkPreview(
-                        linkUrl: tLink,
-                        onTap: () => _launchURL(Uri.parse(tLink)),
+                      if (loading)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0, bottom: 16),
+                          child: CircularProgressIndicator(
+                            backgroundColor: Colors.black.withOpacity(.4),
+                          ),
+                        ),
+                      if (errMsg.isNotEmpty)
+                        Container(
+                          color: Colors.red,
+                          width: MediaQuery.of(context).size.width,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 60),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('Error:', style: Stylez.bold),
+                                Text(
+                                  errMsg,
+                                  style: Stylez.errorMsg,
+                                  textAlign: TextAlign.left,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      SizedBox(
+                        height: 10,
                       ),
-                    ),
-                  Center(
-                    child: IconButton(
-                      icon: Icon(Icons.info_outline),
-                      onPressed: () => _onAboutTapped(),
-                    ),
-                  )
-                ],
+                      if (tLink.isNotEmpty)
+                        Container(
+                          constraints:
+                              BoxConstraints(maxWidth: orientation == Orientation.portrait ? 350 : 400),
+                          child: LastLinkPreview(
+                            linkUrl: tLink,
+                            onTap: () => _launchURL(Uri.parse(tLink)),
+                          ),
+                        ),
+                      Center(
+                        child: IconButton(
+                          icon: Icon(Icons.info_outline),
+                          onPressed: () => _onAboutTapped(),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
+              Positioned(
+                child: IconButton(
+                  icon: Icon(Icons.settings),
+                  color: Colors.grey,
+                  onPressed: _onSettingsPressed,
+                ),
+                bottom: 20,
+                right: 20,
+              ),
+            ],
           ),
         ),
       ),
@@ -278,5 +291,9 @@ class _HomeState extends State<Home> {
             child: Text('Open issue on Github'))
       ],
     );
+  }
+
+  void _onSettingsPressed() {
+
   }
 }
