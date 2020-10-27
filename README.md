@@ -34,3 +34,9 @@ Two types of Twitter urls that I know are not supported (as of 8/29/2020) of are
 2. Article links
 
 However, if you have a twitter url that works in your desktop web browser with nitter but fails in my app, please [open an issue](https://github.com/aaronfg/fluffernitter/issues) and I'll try and get a fix out.
+
+**Q: Is this available in the Play Store or F-Droid?**
+
+**A:** Not yet. I'll be getting the Play Store version up hopefully in the next few months. I'm not sure if I'll be publishing to F-Droid at all but we'll see.
+
+For now, if you don't want to checkout the project and build it yourself, there are release version apks in the [builds/android](https://github.com/aaronfg/fluffernitter/tree/master/builds/android) folder that you can sideload directly on your phone.
