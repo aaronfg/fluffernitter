@@ -1,14 +1,21 @@
 import 'dart:async';
 
+import 'package:fluffernitter/models/user_prefs.dart';
+import 'package:fluffernitter/service_locator.dart';
+import 'package:fluffernitter/services/user_prefs_service.dart';
 import 'package:fluffernitter/styles.dart';
 import 'package:fluffernitter/widgets/last_link_preview.dart';
+import 'package:fluffernitter/widgets/settings.dart';
+import 'package:fluffernitter/widgets/unsupported_url_content.dart';
+import 'package:fluffernitter/widgets/unuspported_text_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:html/parser.dart';
+import 'package:http/http.dart' as http;
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -17,21 +24,28 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   StreamSubscription _sub;
+  StreamSubscription _intentDataStreamSubscription;
+  List<String> _whitelistHosts = ['twitter.com', 'mobile.twitter.com', 't.co'];
   String tLink = '';
   String errMsg = '';
-  String duh = 'You have to tap a Twitter.com link for this app to do anything.';
+  String duh =
+      'You have to tap a Twitter.com link for this app to do anything.';
   bool loading = false;
+  bool _alwaysRedirectOtherUrls = false;
 
   @override
   void initState() {
     FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
+    _initPrefs();
     _initUniLinks();
+    _initShareIntentHandling();
     super.initState();
   }
 
   @override
   void dispose() {
     _sub.cancel();
+    _intentDataStreamSubscription.cancel();
     super.dispose();
   }
 
@@ -40,70 +54,93 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: SafeArea(
         child: OrientationBuilder(
-          builder: (context, orientation) => Center(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Text('fluffernitter',
-                      style: Stylez.appTitle.copyWith(color: Theme.of(context).accentColor)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 60),
-                    child: Text(
-                      duh,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  if (loading)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0, bottom: 16),
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.black.withOpacity(.4),
-                      ),
-                    ),
-                  if (errMsg.isNotEmpty)
-                    Container(
-                      color: Colors.red,
-                      width: MediaQuery.of(context).size.width,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 60),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Error:', style: Stylez.bold),
-                            Text(
-                              errMsg,
-                              style: Stylez.errorMsg,
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
+          builder: (context, orientation) => Stack(
+            children: [
+              Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Text('fluffernitter',
+                          style: Stylez.forContext(context, Stylez.appTitle)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 60),
+                        child: Text(
+                          duh,
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                    ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  if (tLink.isNotEmpty)
-                    Container(
-                      constraints:
-                          BoxConstraints(maxWidth: orientation == Orientation.portrait ? 350 : 400),
-                      child: LastLinkPreview(
-                        linkUrl: tLink,
-                        onTap: () => _launchURL(Uri.parse(tLink)),
+                      if (loading)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0, bottom: 16),
+                          child: CircularProgressIndicator(
+                            backgroundColor: Colors.black.withOpacity(.4),
+                          ),
+                        ),
+                      if (errMsg.isNotEmpty)
+                        Container(
+                          color: Colors.red,
+                          width: MediaQuery.of(context).size.width,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 60),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('Error:', style: Stylez.bold),
+                                Text(
+                                  errMsg,
+                                  style: Stylez.errorMsg,
+                                  textAlign: TextAlign.left,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      SizedBox(
+                        height: 10,
                       ),
-                    ),
-                  Center(
-                    child: IconButton(
-                      icon: Icon(Icons.info_outline),
-                      onPressed: () => _onAboutTapped(),
-                    ),
-                  )
-                ],
+                      if (tLink.isNotEmpty)
+                        Container(
+                          constraints: BoxConstraints(
+                              maxWidth: orientation == Orientation.portrait
+                                  ? 350
+                                  : 400),
+                          child: LastLinkPreview(
+                            linkUrl: tLink,
+                            onTap: () => _launchURL(Uri.parse(tLink)),
+                          ),
+                        ),
+                      Center(
+                        child: IconButton(
+                          icon: Icon(Icons.info_outline),
+                          onPressed: () => _onAboutTapped(),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
+              Positioned(
+                child: IconButton(
+                  icon: Icon(Icons.settings),
+                  color: Colors.grey,
+                  onPressed: _onSettingsPressed,
+                ),
+                bottom: 20,
+                right: 20,
+              ),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  void _initPrefs() {
+    UserPrefsService prefsSrv = locator.get<UserPrefsService>();
+    prefsSrv.clearSettings();
+    prefsSrv.init();
   }
 
   void _handleLinkUpdates(Uri uri) async {
@@ -131,7 +168,8 @@ class _HomeState extends State<Home> {
           _launchURL(_makeNitterUri(twitterUri));
         } else {
           setState(() {
-            errMsg = 'Could not get the redirected twitter url from t.co shortlink.';
+            errMsg =
+                'Could not get the redirected twitter url from t.co shortlink.';
           });
         }
       } catch (err) {
@@ -197,9 +235,11 @@ class _HomeState extends State<Home> {
   }
 
   Uri _makeNitterUri(Uri tUri) {
+    UserPrefsService prefsSrv = locator.get<UserPrefsService>();
+    UserPrefs prefs = prefsSrv.userPrefs;
     final Uri nUri = Uri(
       scheme: 'https',
-      host: 'nitter.net',
+      host: prefs.nitterInstance.host,
       path: tUri.path,
     );
     return nUri;
@@ -236,6 +276,91 @@ class _HomeState extends State<Home> {
     }
   }
 
+  _initShareIntentHandling() {
+    // For sharing or opening urls/text coming from outside the app while the app is in the memory
+    _intentDataStreamSubscription =
+        ReceiveSharingIntent.getTextStream().listen((String value) {
+      print('app already open, received text: $value');
+      setState(() {
+        _parseSharedText(value);
+      });
+    }, onError: (err) {
+      print("getLinkStream error: $err");
+    });
+
+    // For sharing or opening urls/text coming from outside the app while the app is closed
+    ReceiveSharingIntent.getInitialText().then((String value) {
+      print('app closed, received text: $value');
+      setState(() {
+        _parseSharedText(value);
+      });
+    });
+  }
+
+  bool _isValidUri(Uri uri) {
+    return uri.hasScheme && _whitelistHosts.contains(uri.host);
+  }
+
+  bool _isUrl(Uri uri) {
+    return uri.hasScheme && (uri.host != null && uri.host.isNotEmpty);
+  }
+
+  void _parseSharedText(String txt) {
+    try {
+      Uri uri = Uri.parse(txt);
+      // all good
+      if (_isValidUri(uri)) {
+        _handleLinkUpdates(uri);
+      } else if (_isUrl(uri)) {
+        // are we at least a url?
+        print('-----> Not a twitter link! redirect to browser');
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Oops'),
+            content: SingleChildScrollView(
+              child: UnsupportedUrlContent(
+                badUrl: txt,
+                alwaysRedirectOtherUrls: _alwaysRedirectOtherUrls,
+                onAlwaysRedirectPrefChange: _onAlwaysRedirectPrefChange,
+              ),
+            ),
+            actions: [
+              FlatButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Close')),
+              FlatButton(
+                  onPressed: () => _launchURL(uri, updateTLink: false),
+                  child: Text('Open in browser'))
+            ],
+          ),
+        );
+      } else {
+        // this has to just be text. no bueno.
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Oops'),
+            content: SingleChildScrollView(
+              child: UnsupportedTextContent(
+                text: txt,
+              ),
+            ),
+            actions: [
+              FlatButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Ok'))
+            ],
+          ),
+        );
+      }
+    } catch (err) {
+      if (err is FormatException) {
+        print('EXCEPTION!!');
+      }
+    }
+  }
+
   void _launchURL(Uri yuri, {bool updateTLink = true}) async {
     if (await canLaunch(yuri.toString())) {
       setState(() {
@@ -252,15 +377,22 @@ class _HomeState extends State<Home> {
     }
   }
 
+  void _onAlwaysRedirectPrefChange(bool value) {
+    setState(() {
+      _alwaysRedirectOtherUrls = value;
+    });
+  }
+
   void _onAboutTapped() {
     showAboutDialog(
       context: context,
       applicationName: 'fluffernitter',
-      applicationVersion: '1.0.5',
+      applicationVersion: '1.0.6',
       applicationIcon: Container(
         decoration: BoxDecoration(shape: BoxShape.circle),
         child: CircleAvatar(
-          backgroundImage: AssetImage("assets/fluffernitter_logo_icon_alpha.png"),
+          backgroundImage:
+              AssetImage("assets/fluffernitter_logo_icon_alpha.png"),
           backgroundColor: Colors.transparent,
         ),
       ),
@@ -277,6 +409,18 @@ class _HomeState extends State<Home> {
                 updateTLink: false),
             child: Text('Open issue on Github'))
       ],
+    );
+  }
+
+  void _onSettingsPressed() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Settings()),
     );
   }
 }
