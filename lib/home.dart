@@ -28,8 +28,7 @@ class _HomeState extends State<Home> {
   List<String> _whitelistHosts = ['twitter.com', 'mobile.twitter.com', 't.co'];
   String tLink = '';
   String errMsg = '';
-  String duh =
-      'You have to tap a Twitter.com link for this app to do anything.';
+  String duh = 'You have to tap a Twitter.com link for this app to do anything.';
   bool loading = false;
   bool _alwaysRedirectOtherUrls = false;
 
@@ -60,11 +59,9 @@ class _HomeState extends State<Home> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Text('fluffernitter',
-                          style: Stylez.forContext(context, Stylez.appTitle)),
+                      Text('fluffernitter', style: Stylez.forContext(context, Stylez.appTitle)),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 60),
+                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 60),
                         child: Text(
                           duh,
                           textAlign: TextAlign.center,
@@ -82,8 +79,7 @@ class _HomeState extends State<Home> {
                           color: Colors.red,
                           width: MediaQuery.of(context).size.width,
                           child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 60),
+                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 60),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -103,9 +99,7 @@ class _HomeState extends State<Home> {
                       if (tLink.isNotEmpty)
                         Container(
                           constraints: BoxConstraints(
-                              maxWidth: orientation == Orientation.portrait
-                                  ? 350
-                                  : 400),
+                              maxWidth: orientation == Orientation.portrait ? 350 : 400),
                           child: LastLinkPreview(
                             linkUrl: tLink,
                             onTap: () => _launchURL(Uri.parse(tLink)),
@@ -168,8 +162,7 @@ class _HomeState extends State<Home> {
           _launchURL(_makeNitterUri(twitterUri));
         } else {
           setState(() {
-            errMsg =
-                'Could not get the redirected twitter url from t.co shortlink.';
+            errMsg = 'Could not get the redirected twitter url from t.co shortlink.';
           });
         }
       } catch (err) {
@@ -246,13 +239,17 @@ class _HomeState extends State<Home> {
   }
 
   Uri _makeNitterUriFromTopicsUri(Uri topicsUri) {
+    UserPrefsService prefsSrv = locator.get<UserPrefsService>();
+    UserPrefs prefs = prefsSrv.userPrefs;
     var tweetId = topicsUri.pathSegments.last;
-    return Uri(scheme: 'https', host: 'nitter.net', path: 'i/status/$tweetId');
+    return Uri(scheme: 'https', host: prefs.nitterInstance.host, path: 'i/status/$tweetId');
   }
 
   Uri _makeNitterUriFromMediaGridUri(Uri mgUri) {
+    UserPrefsService prefsSrv = locator.get<UserPrefsService>();
+    UserPrefs prefs = prefsSrv.userPrefs;
     var segs = mgUri.pathSegments.sublist(0, mgUri.pathSegments.length - 1);
-    return Uri(scheme: 'https', host: 'nitter.net', pathSegments: segs);
+    return Uri(scheme: 'https', host: prefs.nitterInstance.host, pathSegments: segs);
   }
 
   Future<Null> _initUniLinks() async {
@@ -278,8 +275,7 @@ class _HomeState extends State<Home> {
 
   _initShareIntentHandling() {
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
-    _intentDataStreamSubscription =
-        ReceiveSharingIntent.getTextStream().listen((String value) {
+    _intentDataStreamSubscription = ReceiveSharingIntent.getTextStream().listen((String value) {
       print('app already open, received text: $value');
       setState(() {
         _parseSharedText(value);
@@ -326,9 +322,7 @@ class _HomeState extends State<Home> {
               ),
             ),
             actions: [
-              FlatButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text('Close')),
+              FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Close')),
               FlatButton(
                   onPressed: () => _launchURL(uri, updateTLink: false),
                   child: Text('Open in browser'))
@@ -346,11 +340,7 @@ class _HomeState extends State<Home> {
                 text: txt,
               ),
             ),
-            actions: [
-              FlatButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text('Ok'))
-            ],
+            actions: [FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Ok'))],
           ),
         );
       }
@@ -391,8 +381,7 @@ class _HomeState extends State<Home> {
       applicationIcon: Container(
         decoration: BoxDecoration(shape: BoxShape.circle),
         child: CircleAvatar(
-          backgroundImage:
-              AssetImage("assets/fluffernitter_logo_icon_alpha.png"),
+          backgroundImage: AssetImage("assets/fluffernitter_logo_icon_alpha.png"),
           backgroundColor: Colors.transparent,
         ),
       ),
