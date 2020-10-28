@@ -4,6 +4,7 @@ import 'package:fluffernitter/models/user_prefs.dart';
 import 'package:fluffernitter/service_locator.dart';
 import 'package:fluffernitter/services/user_prefs_service.dart';
 import 'package:fluffernitter/styles.dart';
+import 'package:fluffernitter/utils.dart';
 import 'package:fluffernitter/widgets/last_link_preview.dart';
 import 'package:fluffernitter/widgets/settings.dart';
 import 'package:fluffernitter/widgets/unsupported_url_content.dart';
@@ -138,18 +139,18 @@ class _HomeState extends State<Home> {
   }
 
   void _handleLinkUpdates(Uri uri) async {
-    if (_isRedirect(uri)) {
-      var redirectUrl = _getUriFromRedirect(uri);
+    if (Utils.isRedirect(uri)) {
+      var redirectUrl = Utils.getUriFromRedirect(uri);
       var redUri = Uri.parse(redirectUrl);
       // if this is a 'topics' link, just redirect to the tweet
-      if (_isTopicsLink(redUri)) {
+      if (Utils.isTopicsLink(redUri)) {
         _launchURL(_makeNitterUriFromTopicsUri(redUri));
-      } else if (_isMediaGridLink(redUri)) {
+      } else if (Utils.isMediaGridLink(redUri)) {
         _launchURL(_makeNitterUriFromMediaGridUri(redUri));
       } else {
         _launchURL(_makeNitterUri(redUri));
       }
-    } else if (_isShortLink(uri)) {
+    } else if (Utils.isShortLink(uri)) {
       try {
         setState(() {
           loading = true;
@@ -159,6 +160,7 @@ class _HomeState extends State<Home> {
           loading = false;
         });
         if (twitterUri != null) {
+          // also test if this is a twitter url
           _launchURL(_makeNitterUri(twitterUri));
         } else {
           setState(() {
@@ -171,7 +173,7 @@ class _HomeState extends State<Home> {
           errMsg = err.toString();
         });
       }
-    } else if (_isMediaGridLink(uri)) {
+    } else if (Utils.isMediaGridLink(uri)) {
       _launchURL(_makeNitterUriFromMediaGridUri(uri));
     } else {
       setState(() {
@@ -181,43 +183,44 @@ class _HomeState extends State<Home> {
     }
   }
 
-  bool _isShortLink(Uri uri) {
-    return uri.host == 't.co';
-  }
+  // bool _isShortLink(Uri uri) {
+  //   return uri.host == 't.co';
+  // }
 
-  bool _isRedirect(Uri uri) {
-    return uri.pathSegments.last == 'redirect';
-  }
+  // bool _isRedirect(Uri uri) {
+  //   return uri.pathSegments.last == 'redirect';
+  // }
 
-  bool _isTopicsLink(Uri uri) {
-    return uri.path.contains('/i/topics/tweet/');
-  }
+  // bool _isTopicsLink(Uri uri) {
+  //   return uri.path.contains('/i/topics/tweet/');
+  // }
 
-  bool _isMediaGridLink(Uri uri) {
-    return uri.path.endsWith('media/grid');
-  }
+  // bool _isMediaGridLink(Uri uri) {
+  //   return uri.path.endsWith('media/grid');
+  // }
 
-  String _getUriFromRedirect(Uri redUri) {
-    return redUri.queryParameters['url'];
-  }
+  // String _getUriFromRedirect(Uri redUri) {
+  //   return redUri.queryParameters['url'];
+  // }
 
-  Uri _getUriFromRedirectBody(String body) {
-    var doc = parse(body);
-    var linkEl = doc.getElementsByTagName('link');
-    for (var link in linkEl) {
-      if (link.attributes['rel'] == 'canonical') {
-        print('final twitter url:');
-        print(link.attributes['href']);
-        return Uri.parse(link.attributes['href']);
-      }
-    }
-    return null;
-  }
+  // Uri _getUriFromRedirectBody(String body) {
+  //   var doc = parse(body);
+  //   var linkEl = doc.getElementsByTagName('link');
+  //   for (var link in linkEl) {
+  //     if (link.attributes['rel'] == 'canonical') {
+  //       print('final twitter url:');
+  //       print(link.attributes['href']);
+  //       return Uri.parse(link.attributes['href']);
+  //     }
+  //   }
+  //   return null;
+  // }
 
   Future<Uri> _getUriFromShortLinkUri(Uri shortUri) async {
     try {
       var shortLinkResponse = await http.get(shortUri.toString());
-      var twitterUri = _getUriFromRedirectBody(shortLinkResponse.body);
+      var twitterUri = Utils.getUriFromRedirectBody(shortLinkResponse.body);
+      // TODO - check if this is a valid twitter url. the t.co could redirect to non-twitter pages. duh
       return twitterUri;
     } catch (err) {
       setState(() {
