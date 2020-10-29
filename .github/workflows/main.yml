@@ -38,7 +38,7 @@ jobs:
       - run: flutter packages pub run build_runner build
       - run: flutter analyze
       - run: flutter test --coverage .
-      - name: Dart Full Coverage  
+      # - name: Dart Full Coverage  
       - uses: codecov/codecov-action@v1
         with:
           file: ./coverage/lcov.info
