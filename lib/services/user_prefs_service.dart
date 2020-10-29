@@ -53,10 +53,9 @@ class UserPrefsService {
     print('updated nitterInstance: $newInstance');
   }
 
-  void savePrefs() async {
+  Future<void> savePrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var saved = await prefs.setString(
-        PrefsKeys.UserPrefs, json.encode(userPrefs.toJson()));
+    var saved = await prefs.setString(PrefsKeys.UserPrefs, json.encode(userPrefs.toJson()));
     if (!saved) {
       throw (Exception(ExceptionMessage.FailedToSavePreference));
     }
