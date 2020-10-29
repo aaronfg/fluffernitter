@@ -24,6 +24,11 @@ jobs:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      - name: Setup Java JDK
+        uses: actions/setup-java@v1.4.3
+        with:
+          java-version: "12.x"
+
       - name: Dart Full Coverage
         uses: stelynx/dart-full-coverage@v1.0.3
         with:
