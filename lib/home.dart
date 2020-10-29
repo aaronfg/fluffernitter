@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:fluffernitter/models/user_prefs.dart';
 import 'package:fluffernitter/service_locator.dart';
 import 'package:fluffernitter/services/user_prefs_service.dart';
 import 'package:fluffernitter/styles.dart';
@@ -12,7 +11,6 @@ import 'package:fluffernitter/widgets/unuspported_text_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
@@ -26,7 +24,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   StreamSubscription _sub;
   StreamSubscription _intentDataStreamSubscription;
-  List<String> _whitelistHosts = ['twitter.com', 'mobile.twitter.com', 't.co'];
   String tLink = '';
   String errMsg = '';
   String duh = 'You have to tap a Twitter.com link for this app to do anything.';
@@ -144,77 +141,49 @@ class _HomeState extends State<Home> {
       var redUri = Uri.parse(redirectUrl);
       // if this is a 'topics' link, just redirect to the tweet
       if (Utils.isTopicsLink(redUri)) {
-        _launchURL(_makeNitterUriFromTopicsUri(redUri));
+        _launchURL(Utils.makeNitterUriFromTopicsUri(redUri));
       } else if (Utils.isMediaGridLink(redUri)) {
-        _launchURL(_makeNitterUriFromMediaGridUri(redUri));
+        _launchURL(Utils.makeNitterUriFromMediaGridUri(redUri));
       } else {
-        _launchURL(_makeNitterUri(redUri));
+        _launchURL(Utils.makeNitterUri(redUri));
       }
     } else if (Utils.isShortLink(uri)) {
+      Uri resolvedUri;
       try {
         setState(() {
           loading = true;
         });
-        var twitterUri = await _getUriFromShortLinkUri(uri);
+        resolvedUri = await Utils.getUriFromShortLinkUri(uri);
         setState(() {
           loading = false;
         });
-        if (twitterUri != null) {
-          // also test if this is a twitter url
-          _launchURL(_makeNitterUri(twitterUri));
-        } else {
-          setState(() {
-            errMsg = 'Could not get the redirected twitter url from t.co shortlink.';
-          });
-        }
       } catch (err) {
         setState(() {
           loading = false;
           errMsg = err.toString();
         });
       }
+      // Now that we have the fully resolved Uri, also
+      // test if this is a twitter url
+      try {
+        if (Utils.isValidUri(resolvedUri)) {
+          _launchURL(Utils.makeNitterUri(resolvedUri));
+        } else {}
+      } catch (err) {
+        print('error: $err');
+        setState(() {
+          errMsg = 'Could not get the redirected twitter url from t.co shortlink.';
+        });
+      }
     } else if (Utils.isMediaGridLink(uri)) {
-      _launchURL(_makeNitterUriFromMediaGridUri(uri));
+      _launchURL(Utils.makeNitterUriFromMediaGridUri(uri));
     } else {
       setState(() {
         errMsg = '';
       });
-      _launchURL(_makeNitterUri(uri));
+      _launchURL(Utils.makeNitterUri(uri));
     }
   }
-
-  // bool _isShortLink(Uri uri) {
-  //   return uri.host == 't.co';
-  // }
-
-  // bool _isRedirect(Uri uri) {
-  //   return uri.pathSegments.last == 'redirect';
-  // }
-
-  // bool _isTopicsLink(Uri uri) {
-  //   return uri.path.contains('/i/topics/tweet/');
-  // }
-
-  // bool _isMediaGridLink(Uri uri) {
-  //   return uri.path.endsWith('media/grid');
-  // }
-
-  // String _getUriFromRedirect(Uri redUri) {
-  //   return redUri.queryParameters['url'];
-  // }
-
-  // Uri _getUriFromRedirectBody(String body) {
-  //   var doc = parse(body);
-  //   var linkEl = doc.getElementsByTagName('link');
-  //   for (var link in linkEl) {
-  //     if (link.attributes['rel'] == 'canonical') {
-  //       print('final twitter url:');
-  //       print(link.attributes['href']);
-  //       return Uri.parse(link.attributes['href']);
-  //     }
-  //   }
-  //   return null;
-  // }
 
   Future<Uri> _getUriFromShortLinkUri(Uri shortUri) async {
     try {
@@ -228,31 +197,6 @@ class _HomeState extends State<Home> {
       });
     }
     return null;
-  }
-
-  Uri _makeNitterUri(Uri tUri) {
-    UserPrefsService prefsSrv = locator.get<UserPrefsService>();
-    UserPrefs prefs = prefsSrv.userPrefs;
-    final Uri nUri = Uri(
-      scheme: 'https',
-      host: prefs.nitterInstance.host,
-      path: tUri.path,
-    );
-    return nUri;
-  }
-
-  Uri _makeNitterUriFromTopicsUri(Uri topicsUri) {
-    UserPrefsService prefsSrv = locator.get<UserPrefsService>();
-    UserPrefs prefs = prefsSrv.userPrefs;
-    var tweetId = topicsUri.pathSegments.last;
-    return Uri(scheme: 'https', host: prefs.nitterInstance.host, path: 'i/status/$tweetId');
-  }
-
-  Uri _makeNitterUriFromMediaGridUri(Uri mgUri) {
-    UserPrefsService prefsSrv = locator.get<UserPrefsService>();
-    UserPrefs prefs = prefsSrv.userPrefs;
-    var segs = mgUri.pathSegments.sublist(0, mgUri.pathSegments.length - 1);
-    return Uri(scheme: 'https', host: prefs.nitterInstance.host, pathSegments: segs);
   }
 
   Future<Null> _initUniLinks() async {
@@ -296,62 +240,61 @@ class _HomeState extends State<Home> {
     });
   }
 
-  bool _isValidUri(Uri uri) {
-    return uri.hasScheme && _whitelistHosts.contains(uri.host);
-  }
-
-  bool _isUrl(Uri uri) {
-    return uri.hasScheme && (uri.host != null && uri.host.isNotEmpty);
-  }
-
   void _parseSharedText(String txt) {
     try {
       Uri uri = Uri.parse(txt);
-      // all good
-      if (_isValidUri(uri)) {
+      // twitter domains we're looking for?
+      if (Utils.isValidUri(uri)) {
         _handleLinkUpdates(uri);
-      } else if (_isUrl(uri)) {
-        // are we at least a url?
-        print('-----> Not a twitter link! redirect to browser');
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Oops'),
-            content: SingleChildScrollView(
-              child: UnsupportedUrlContent(
-                badUrl: txt,
-                alwaysRedirectOtherUrls: _alwaysRedirectOtherUrls,
-                onAlwaysRedirectPrefChange: _onAlwaysRedirectPrefChange,
-              ),
-            ),
-            actions: [
-              FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Close')),
-              FlatButton(
-                  onPressed: () => _launchURL(uri, updateTLink: false),
-                  child: Text('Open in browser'))
-            ],
-          ),
-        );
+      } else if (Utils.isUrl(uri)) {
+        // this is not a url
+        _showUnsupportedUrlContentAlert(txt, uri);
       } else {
         // this has to just be text. no bueno.
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Oops'),
-            content: SingleChildScrollView(
-              child: UnsupportedTextContent(
-                text: txt,
-              ),
-            ),
-            actions: [FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Ok'))],
-          ),
-        );
+        _showUnsupportedTextContent(txt, uri);
       }
     } catch (err) {
       if (err is FormatException) {
         print('EXCEPTION!!');
       }
     }
+  }
+
+  void _showUnsupportedUrlContentAlert(String txt, Uri uri) {
+    print('-----> Not a twitter link! redirect to browser');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Oops'),
+        content: SingleChildScrollView(
+          child: UnsupportedUrlContent(
+            badUrl: txt,
+            alwaysRedirectOtherUrls: _alwaysRedirectOtherUrls,
+            onAlwaysRedirectPrefChange: _onAlwaysRedirectPrefChange,
+          ),
+        ),
+        actions: [
+          FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Close')),
+          FlatButton(
+              onPressed: () => _launchURL(uri, updateTLink: false), child: Text('Open in browser'))
+        ],
+      ),
+    );
+  }
+
+  void _showUnsupportedTextContent(String txt, Uri uri) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Oops'),
+        content: SingleChildScrollView(
+          child: UnsupportedTextContent(
+            text: txt,
+          ),
+        ),
+        actions: [FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Ok'))],
+      ),
+    );
   }
 
   void _launchURL(Uri yuri, {bool updateTLink = true}) async {

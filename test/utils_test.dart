@@ -22,24 +22,15 @@ void main() {
     Uri twitterMobileAsUri = Uri.parse('https://mobile.twitter.com/realgdt');
     Uri mediaUri = Uri.parse('https://twitter.com/realgdt/media');
     Uri mediaGridUri = Uri.parse('https://twitter.com/realgdt/media/grid');
-    //"https://mobile.twitter.com/PhilippeLENOIR2/status/1318621719591092225/photo/4"
-    // "https://twitter.com/realgdt/media"
-    /*
-      https://www.robrhinehart.com/why-i-am-voting-for-kanye-west/ <-- a t.co redirect got to this.
-      from this https://t.co/TlwzNXRTkL?amp=1
-     */
-
-    // topics url
-    // https://twitter.com/i/topics/tweet/1252936339739181057?cn=ZmxleGlibGVfcmVjc18y&refsrc=email
-    test('isTwitterLink()', () {
+    test('isValidUri()', () {
       var badUri = Uri.parse('https://google.com');
-      expect(Utils.isTwitterLink(badUri), equals(false));
-      expect(Utils.isTwitterLink(mediaGridUri), equals(true));
-      expect(Utils.isTwitterLink(mediaUri), equals(true));
-      expect(Utils.isTwitterLink(twitterMobileAsUri), equals(true));
-      expect(Utils.isTwitterLink(twitterAsUri), equals(true));
-      expect(Utils.isTwitterLink(topicsUri), equals(true));
-      expect(Utils.isTwitterLink(shortAsUri), equals(true));
+      expect(Utils.isValidUri(badUri), equals(false));
+      expect(Utils.isValidUri(mediaGridUri), equals(true));
+      expect(Utils.isValidUri(mediaUri), equals(true));
+      expect(Utils.isValidUri(twitterMobileAsUri), equals(true));
+      expect(Utils.isValidUri(twitterAsUri), equals(true));
+      expect(Utils.isValidUri(topicsUri), equals(true));
+      expect(Utils.isValidUri(shortAsUri), equals(true));
     });
     test('isShortLink()', () {
       var isShort = Utils.isShortLink(shortAsUri);

@@ -5,8 +5,14 @@ import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 
 class Utils {
-  static bool isTwitterLink(Uri uri) {
-    return uri.host == 't.co' || uri.host == 'twitter.com' || uri.host == 'mobile.twitter.com';
+  static List<String> whitelistHosts = ['twitter.com', 'mobile.twitter.com', 't.co'];
+
+  static bool isUrl(Uri uri) {
+    return uri.hasScheme && (uri.host != null && uri.host.isNotEmpty);
+  }
+
+  static bool isValidUri(Uri uri) {
+    return uri.hasScheme && whitelistHosts.contains(uri.host);
   }
 
   static bool isShortLink(Uri uri) {
