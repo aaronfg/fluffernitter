@@ -4,6 +4,8 @@
 // utility that Flutter provides. For example, you can send tap and scroll
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
+import 'dart:math';
+
 import 'package:fluffernitter/utils.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,11 +24,23 @@ void main() {
     Uri mediaGridUri = Uri.parse('https://twitter.com/realgdt/media/grid');
     //"https://mobile.twitter.com/PhilippeLENOIR2/status/1318621719591092225/photo/4"
     // "https://twitter.com/realgdt/media"
-    //https://www.robrhinehart.com/why-i-am-voting-for-kanye-west/ <-- a t.co redirect got to this.
-    // from this https://t.co/TlwzNXRTkL?amp=1
+    /*
+      https://www.robrhinehart.com/why-i-am-voting-for-kanye-west/ <-- a t.co redirect got to this.
+      from this https://t.co/TlwzNXRTkL?amp=1
+     */
+
     // topics url
     // https://twitter.com/i/topics/tweet/1252936339739181057?cn=ZmxleGlibGVfcmVjc18y&refsrc=email
-
+    test('isTwitterLink()', () {
+      var badUri = Uri.parse('https://google.com');
+      expect(Utils.isTwitterLink(badUri), equals(false));
+      expect(Utils.isTwitterLink(mediaGridUri), equals(true));
+      expect(Utils.isTwitterLink(mediaUri), equals(true));
+      expect(Utils.isTwitterLink(twitterMobileAsUri), equals(true));
+      expect(Utils.isTwitterLink(twitterAsUri), equals(true));
+      expect(Utils.isTwitterLink(topicsUri), equals(true));
+      expect(Utils.isTwitterLink(shortAsUri), equals(true));
+    });
     test('isShortLink()', () {
       var isShort = Utils.isShortLink(shortAsUri);
       expect(isShort, equals(true));
@@ -34,7 +48,13 @@ void main() {
       expect(isntShort, equals(false));
     });
 
-    test('isTopicsUrl()', () {
+    test('isMediaGridLink()', () {
+      var isRedirect = Utils.isMediaGridLink(mediaGridUri);
+      expect(isRedirect, equals(true));
+      expect(Utils.isMediaGridLink(twitterMobileAsUri), equals(false));
+    });
+
+    test('isTopicsLink()', () {
       expect(Utils.isTopicsLink(topicsUri), equals(true));
       expect(Utils.isTopicsLink(Uri.parse('https://twitter.com')), equals(false));
     });

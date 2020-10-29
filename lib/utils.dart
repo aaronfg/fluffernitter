@@ -5,6 +5,10 @@ import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 
 class Utils {
+  static bool isTwitterLink(Uri uri) {
+    return uri.host == 't.co' || uri.host == 'twitter.com' || uri.host == 'mobile.twitter.com';
+  }
+
   static bool isShortLink(Uri uri) {
     return uri.host == 't.co';
   }
