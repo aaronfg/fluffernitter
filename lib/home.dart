@@ -11,7 +11,6 @@ import 'package:fluffernitter/widgets/unuspported_text_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-import 'package:http/http.dart' as http;
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -188,21 +187,6 @@ class _HomeState extends State<Home> {
       });
       _launchURL(Utils.makeNitterUri(uri));
     }
-  }
-
-  Future<Uri> _getUriFromShortLinkUri(Uri shortUri) async {
-    try {
-      var shortLinkResponse = await http.get(shortUri.toString());
-      var twitterUri = Utils.getUriFromRedirectBody(shortLinkResponse.body);
-      // TODO - check if this is a valid twitter url. the t.co could redirect to non-twitter pages. duh
-      return twitterUri;
-    } catch (err) {
-      setState(() {
-        errMsg = err.toString();
-        tLink = '';
-      });
-    }
-    return null;
   }
 
   Future<Null> _initUniLinks() async {
