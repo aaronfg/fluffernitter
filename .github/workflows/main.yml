@@ -33,7 +33,6 @@ jobs:
       #  uses: stelynx/dart-full-coverage@v1.0.3
       #  with:
       #    package: fluffernitter 
-      #    use_git_root: false
 
       - run: flutter pub get
       - run: flutter packages pub run build_runner build
@@ -43,3 +42,4 @@ jobs:
       - uses: codecov/codecov-action@v1
         with:
           file: ./coverage/lcov.info
+          package: fluffernitter 
