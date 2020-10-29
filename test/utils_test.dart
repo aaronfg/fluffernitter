@@ -1,11 +1,3 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-import 'dart:math';
-
 import 'package:fluffernitter/utils.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,6 +14,7 @@ void main() {
     Uri twitterMobileAsUri = Uri.parse('https://mobile.twitter.com/realgdt');
     Uri mediaUri = Uri.parse('https://twitter.com/realgdt/media');
     Uri mediaGridUri = Uri.parse('https://twitter.com/realgdt/media/grid');
+
     test('isValidUri()', () {
       var badUri = Uri.parse('https://google.com');
       expect(Utils.isValidUri(badUri), equals(false));
@@ -32,6 +25,7 @@ void main() {
       expect(Utils.isValidUri(topicsUri), equals(true));
       expect(Utils.isValidUri(shortAsUri), equals(true));
     });
+
     test('isShortLink()', () {
       var isShort = Utils.isShortLink(shortAsUri);
       expect(isShort, equals(true));
