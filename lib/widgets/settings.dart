@@ -13,11 +13,7 @@ class _SettingsState extends State<Settings> {
   @override
   void initState() {
     _instanceController = TextEditingController(
-        text: locator
-            .get<UserPrefsService>()
-            .userPrefs
-            .nitterInstance
-            .toString());
+        text: locator.get<UserPrefsService>().userPrefs.nitterInstance.toString());
     super.initState();
   }
 
@@ -41,16 +37,6 @@ class _SettingsState extends State<Settings> {
     // slivs.add(_buildAbout());
     slivs.add(_buildOk());
     return slivs;
-  }
-
-  Widget _buildTitle() {
-    return SliverToBoxAdapter(
-        child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Center(
-          child: Text('Settings',
-              style: Stylez.forContext(context, Stylez.screenTitle))),
-    ));
   }
 
   Widget _buildSectionTitle(String title) {
@@ -97,16 +83,6 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  Widget _buildAbout() {
-    return SliverToBoxAdapter(
-      child: ListTile(
-        title: Text('About'),
-        onTap: () => {},
-        contentPadding: EdgeInsets.symmetric(horizontal: 8),
-      ),
-    );
-  }
-
   Widget _buildOk() {
     return SliverToBoxAdapter(
       child: Padding(
@@ -125,8 +101,7 @@ class _SettingsState extends State<Settings> {
   void _onSaveTap() {
     UserPrefsService prefsSrv = locator.get<UserPrefsService>();
     // if they updated the instance, save it
-    if (_instanceController.text !=
-        prefsSrv.userPrefs.nitterInstance.toString()) {
+    if (_instanceController.text != prefsSrv.userPrefs.nitterInstance.toString()) {
       try {
         prefsSrv.updateNitterInstance(_instanceController.text);
       } catch (er) {
