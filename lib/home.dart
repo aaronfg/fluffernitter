@@ -73,21 +73,24 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                       if (errMsg.isNotEmpty)
-                        Container(
-                          color: Colors.red,
-                          width: MediaQuery.of(context).size.width,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 60),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text('Error:', style: Stylez.bold),
-                                Text(
-                                  errMsg,
-                                  style: Stylez.errorMsg,
-                                  textAlign: TextAlign.left,
-                                ),
-                              ],
+                        Padding(
+                          padding: EdgeInsets.only(top: 10.0),
+                          child: Container(
+                            color: Colors.red,
+                            width: MediaQuery.of(context).size.width,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 60),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('Error:', style: Stylez.bold),
+                                  Text(
+                                    errMsg,
+                                    style: Stylez.errorMsg,
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -161,6 +164,7 @@ class _HomeState extends State<Home> {
         setState(() {
           loading = false;
           errMsg = err.toString();
+          tLink = '';
         });
       }
       // Now that we have the fully resolved Uri, also
@@ -173,6 +177,7 @@ class _HomeState extends State<Home> {
         print('error: $err');
         setState(() {
           errMsg = 'Could not get the redirected twitter url from t.co shortlink.';
+          tLink = '';
         });
       }
     } else if (Utils.isMediaGridLink(uri)) {
@@ -194,6 +199,7 @@ class _HomeState extends State<Home> {
     } catch (err) {
       setState(() {
         errMsg = err.toString();
+        tLink = '';
       });
     }
     return null;
@@ -206,6 +212,7 @@ class _HomeState extends State<Home> {
     }, onError: (err) {
       setState(() {
         errMsg = 'Failed to open';
+        tLink = '';
       });
     });
     try {
@@ -216,6 +223,7 @@ class _HomeState extends State<Home> {
     } on PlatformException {
       setState(() {
         errMsg = 'Something was busted getting the url. Sorry.';
+        tLink = '';
       });
     }
   }
@@ -309,6 +317,7 @@ class _HomeState extends State<Home> {
     } else {
       setState(() {
         errMsg = 'Could not launch ${yuri.toString()}';
+        tLink = '';
       });
     }
   }
