@@ -6,6 +6,8 @@ A Twitter -> [Nitter.net](https://nitter.net) link redirector app written in Flu
 
 ![Android homescreen](docs/homescreen_android.png)
 
+![Link redirect](docs/open_link_01.gif)
+
 ## Description
 
 This app registers itself able to handle **twitter.com**. **mobile.twitter.com** and **t.co** links and redirects them to the approproate nitter.net (or any other Nitter instance) page equivalent. 
