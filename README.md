@@ -41,4 +41,4 @@ However, if you have a twitter url that works in your desktop web browser with n
 
 **A:** Not yet. I'll be getting the Play Store version up hopefully in the next few months. I'm not sure if I'll be publishing to F-Droid at all but we'll see.
 
-For now, if you don't want to checkout the project and build it yourself, there are release version apks in the [builds/android](https://github.com/aaronfg/fluffernitter/tree/master/builds/android) folder that you can sideload directly on your phone.
+For now, if you don't want to checkout the project and build it yourself, there are release version apks added as assets on the [Releases page](https://github.com/aaronfg/fluffernitter/releases) for each release that you can sideload directly on your phone.
