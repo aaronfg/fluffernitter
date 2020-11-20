@@ -316,7 +316,7 @@ class _HomeState extends State<Home> {
     showAboutDialog(
       context: context,
       applicationName: 'fluffernitter',
-      applicationVersion: '1.0.6',
+      applicationVersion: '1.0.61',
       applicationIcon: Container(
         decoration: BoxDecoration(shape: BoxShape.circle),
         child: CircleAvatar(
