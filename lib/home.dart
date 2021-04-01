@@ -133,7 +133,6 @@ class _HomeState extends State<Home> {
 
   void _initPrefs() {
     UserPrefsService prefsSrv = locator.get<UserPrefsService>();
-    prefsSrv.clearSettings();
     prefsSrv.init();
   }
 
