@@ -89,7 +89,7 @@ class _SettingsState extends State<Settings> {
         padding: EdgeInsets.symmetric(vertical: 8.0),
         child: FractionallySizedBox(
           widthFactor: .5,
-          child: RaisedButton(
+          child: ElevatedButton(
             onPressed: _instanceController.text.isEmpty ? null : _onSaveTap,
             child: Text('Save'),
           ),
