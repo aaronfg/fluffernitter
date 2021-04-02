@@ -265,8 +265,8 @@ class _HomeState extends State<Home> {
           ),
         ),
         actions: [
-          FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Close')),
-          FlatButton(
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Close')),
+          TextButton(
               onPressed: () => _launchURL(uri, updateTLink: false), child: Text('Open in browser'))
         ],
       ),
@@ -283,7 +283,7 @@ class _HomeState extends State<Home> {
             text: txt,
           ),
         ),
-        actions: [FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Ok'))],
+        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Ok'))],
       ),
     );
   }
@@ -330,7 +330,7 @@ class _HomeState extends State<Home> {
           child: Text(
               'Disclaimer: Nitter.net doesn\'t support every thing Twitter does (Articles and Moments for example).\n\nHowever, if a link doesn\'t work in this app but works in the browser on nitter.net, please let me know.'),
         ),
-        RaisedButton(
+        ElevatedButton(
             onPressed: () => _launchURL(
                 Uri.parse('https://github.com/aaronfg/fluffernitter/issues'),
                 updateTLink: false),
