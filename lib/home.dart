@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fluffernitter/service_locator.dart';
+import 'package:fluffernitter/services/url_launch_service.dart';
 import 'package:fluffernitter/services/user_prefs_service.dart';
 import 'package:fluffernitter/styles.dart';
 import 'package:fluffernitter/utils.dart';
@@ -289,6 +290,7 @@ class _HomeState extends State<Home> {
   }
 
   void _launchURL(Uri yuri, {bool updateTLink = true}) async {
+    var failMsg = 'Could not launch ${yuri.toString()}';
     if (await canLaunch(yuri.toString())) {
       setState(() {
         if (updateTLink) {
@@ -296,10 +298,17 @@ class _HomeState extends State<Home> {
         }
         errMsg = '';
       });
-      await launch(yuri.toString());
+      try {
+        await UrlLaunchService.redirectToBrowser(yuri);
+      } catch (e) {
+        setState(() {
+          errMsg = failMsg;
+          tLink = '';
+        });
+      }
     } else {
       setState(() {
-        errMsg = 'Could not launch ${yuri.toString()}';
+        errMsg = failMsg;
         tLink = '';
       });
     }
@@ -328,7 +337,7 @@ class _HomeState extends State<Home> {
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
           child: Text(
-              'Disclaimer: Nitter.net doesn\'t support every thing Twitter does (Articles and Moments for example).\n\nHowever, if a link doesn\'t work in this app but works in the browser on nitter.net, please let me know.'),
+              'Disclaimer: Nitter doesn\'t support every thing Twitter does (Articles and Moments for example).\n\nHowever, if a link doesn\'t work in this app but works in the browser on your nitter chosen instance, please let me know.'),
         ),
         ElevatedButton(
             onPressed: () => _launchURL(

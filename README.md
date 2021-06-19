@@ -2,7 +2,7 @@
 
 ![Android homescreen](docs/fluffernitter_logo_header_round_sm.png)
 
-A Twitter -> [Nitter.net](https://nitter.net) link redirector app written in Flutter
+A Twitter -> [Nitter](https://github.com/zedeus/nitter) link redirector app written in Flutter
 
 ![Android homescreen](docs/homescreen_android.png)
 
@@ -10,7 +10,9 @@ A Twitter -> [Nitter.net](https://nitter.net) link redirector app written in Flu
 
 ## Description
 
-This app registers itself able to handle **twitter.com**. **mobile.twitter.com** and **t.co** links and redirects them to the approproate nitter.net (or any other Nitter instance) page equivalent. 
+This app registers itself able to handle **twitter.com**. **mobile.twitter.com** and **t.co** links and redirects them to the approproate Nitter instance page equivalent. 
+
+As of **v1.0.64**, the default nitter instance for this app is [https://nitter.moomoo.me](https://nitter.moomoo.me)
 
 ## How To
 
@@ -18,17 +20,17 @@ Please [visit the wiki](https://github.com/aaronfg/fluffernitter/wiki) for more 
 
 ## FAQ
 
-**Q: What is Nitter.net?**
+**Q: What is Nitter?**
 
-**A:** Nitter.net is a Twitter front-end focused on privacy. [Read a more detailed explanation at the nitter.net website](https://nitter.net/about)
+**A:** Nitter is a Twitter front-end focused on privacy. [Read a more detailed explanation at the nitter project page](https://github.com/zedeus/nitter)
 
-**Q: Can I use a different Nitter instance besides Nitter.net?**
+**Q: Can I use a different Nitter instance besides the default?**
 
 **A:** Of course! You can set the instance url in the settings page. [Read how to set a custom nitter instance in the wiki](https://github.com/aaronfg/fluffernitter/wiki)
 
 **Q: Why doesn't clicking on some links work?**
 
-**A:** Nitter.net doesn't support all types of Twitter features/urls. If you are getting nitter.net pages that don't have info or show "Unsupported feature", that's out of my hands. All I can do is redirect you to nitter.net and hope it supports the twitter url you clicked on.
+**A:** Nitter doesn't support all types of Twitter features/urls. If you are getting nitter pages that don't have info or show "Unsupported feature", that's out of my hands. All I can do is redirect you to nitter and hope it supports the twitter url you clicked on.
 
 Two types of Twitter urls that I know are not supported (as of 8/29/2020) of are: 
 

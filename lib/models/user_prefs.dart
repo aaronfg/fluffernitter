@@ -18,12 +18,11 @@ class UserPrefs {
   /// Creates a new empty UserPrefs instance
   UserPrefs.empty() {
     alwaysRedirectUnsupportedLinks = false;
-    nitterInstance = Uri.parse('https://nitter.net');
+    nitterInstance = Uri.parse('https://nitter.moomoo.me');
   }
 
   /// Generate a new UserPrefs instance from Json
-  factory UserPrefs.fromJson(Map<String, dynamic> json) =>
-      _$UserPrefsFromJson(json);
+  factory UserPrefs.fromJson(Map<String, dynamic> json) => _$UserPrefsFromJson(json);
 
   /// Serializes this class instance to Json
   Map<String, dynamic> toJson() => _$UserPrefsToJson(this);
