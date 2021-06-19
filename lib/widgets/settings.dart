@@ -1,7 +1,9 @@
 import 'package:fluffernitter/service_locator.dart';
+import 'package:fluffernitter/services/url_launch_service.dart';
 import 'package:fluffernitter/services/user_prefs_service.dart';
 import 'package:fluffernitter/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -36,6 +38,7 @@ class _SettingsState extends State<Settings> {
     slivs.add(_buildInstanceSection());
     // slivs.add(_buildAbout());
     slivs.add(_buildOk());
+    slivs.add(_buildPickNewInstance());
     return slivs;
   }
 
@@ -98,6 +101,18 @@ class _SettingsState extends State<Settings> {
     );
   }
 
+  Widget _buildPickNewInstance() {
+    return SliverToBoxAdapter(
+      child: FractionallySizedBox(
+        widthFactor: .5,
+        child: TextButton(
+          onPressed: _instanceController.text.isEmpty ? null : _onFindInstanceTap,
+          child: Text('Find a new instance'),
+        ),
+      ),
+    );
+  }
+
   void _onSaveTap() {
     UserPrefsService prefsSrv = locator.get<UserPrefsService>();
     // if they updated the instance, save it
@@ -111,7 +126,24 @@ class _SettingsState extends State<Settings> {
     Navigator.pop(context);
   }
 
+  void _onFindInstanceTap() {
+    _openInstancesPage();
+  }
+
   void _onInstanceChanged(String value) {
     setState(() {});
+  }
+
+  Future<void> _openInstancesPage() async {
+    var instp = Uri.parse('https://github.com/zedeus/nitter/wiki/Instances');
+    if (await canLaunch(instp.toString())) {
+      try {
+        await UrlLaunchService.redirectToBrowser(instp);
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      print('');
+    }
   }
 }
